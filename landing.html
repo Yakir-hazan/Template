@@ -722,7 +722,7 @@ var isStandalone = window.navigator.standalone === true ||
                    window.matchMedia('(display-mode: standalone)').matches;
 
 /* אם כבר מותקן → קפוץ לאפליקציה */
-if (isStandalone) { window.location.replace("/Template/");
+if (isStandalone) { window.location.replace('/Template/'); }
 
 /* ════════════════════════════════════════════════════
    CAROUSEL DOTS
@@ -841,7 +841,7 @@ function closeModal() {
    SERVICE WORKER REGISTRATION
    ════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(function(){});
+  navigator.serviceWorker.register('/Template/sw.js').catch(function(){});
 }
 </script>
 </body>
