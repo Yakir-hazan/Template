@@ -16,12 +16,12 @@ var CACHE_NAME = 'app-v1.0.0';
    ════════════════════════════════════════ */
 var STATIC_FILES = [
   '/',
-  '/index.html',
-  '/landing.html',
-  '/manifest.json',
-  '/icon.png',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/Template/',
+  '/Template/landing.html',
+  '/Template/manifest.json',
+  '/Template/icon.png',
+  '/Template/icon-192.png',
+  '/Template/icon-512.png',
   /* EDIT: הוסף קבצי JS, CSS, פונטים, תמונות */
   /* '/app.js', */
   /* '/style.css', */
@@ -116,8 +116,8 @@ self.addEventListener('push', function(event) {
   event.waitUntil(
     self.registration.showNotification(data.title || 'התראה', {
       body:    data.body    || '',
-      icon:    data.icon    || '/icon-192.png',
-      badge:   data.badge   || '/icon-192.png',
+      icon:    data.icon    || '/Template/icon-192.png',
+      badge:   data.badge   || '/Template/icon-192.png',
       tag:     data.tag     || 'default',
       data:    data.url     || '/',
       vibrate: [200, 100, 200],

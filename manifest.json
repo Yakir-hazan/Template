@@ -1,14 +1,12 @@
 {
-  "_comment": "EDIT: שנה את כל הערכים המסומנים",
-
   "name":             "שם האפליקציה",
   "short_name":       "שם קצר",
   "description":      "תיאור קצר של האפליקציה",
   "lang":             "he",
   "dir":              "rtl",
 
-  "start_url":        "/index.html",
-  "scope":            "/",
+  "start_url":        "/Template/",
+  "scope":            "/Template/",
   "display":          "standalone",
   "orientation":      "portrait",
 
@@ -17,29 +15,18 @@
 
   "icons": [
     {
-      "src":     "/icon-192.png",
+      "src":     "/Template/icon-192.png",
       "sizes":   "192x192",
       "type":    "image/png",
       "purpose": "any maskable"
     },
     {
-      "src":     "/icon-512.png",
+      "src":     "/Template/icon-512.png",
       "sizes":   "512x512",
       "type":    "image/png",
       "purpose": "any maskable"
     }
   ],
 
-  "screenshots": [
-    {
-      "src":          "/screenshot1.png",
-      "sizes":        "390x844",
-      "type":         "image/png",
-      "form_factor":  "narrow",
-      "label":        "מסך ראשי"
-    }
-  ],
-
-  "categories":  ["utilities", "lifestyle"],
   "prefer_related_applications": false
 }

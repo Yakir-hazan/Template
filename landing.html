@@ -722,7 +722,7 @@ var isStandalone = window.navigator.standalone === true ||
                    window.matchMedia('(display-mode: standalone)').matches;
 
 /* אם כבר מותקן → קפוץ לאפליקציה */
-if (isStandalone) { window.location.replace('/index.html'); }
+if (isStandalone) { window.location.replace("/Template/");
 
 /* ════════════════════════════════════════════════════
    CAROUSEL DOTS
@@ -756,7 +756,7 @@ window.addEventListener('appinstalled', function() {
   _deferredPrompt = null;
   var btn = document.getElementById('heroInstallBtn');
   if (btn) { btn.textContent = '✅ הותקן בהצלחה!'; btn.classList.add('done'); }
-  setTimeout(function(){ window.location.href = '/index.html'; }, 1500);
+  setTimeout(function(){ window.location.href = '/Template/'; }, 1500);
 });
 
 /* ════════════════════════════════════════════════════
