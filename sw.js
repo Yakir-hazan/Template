@@ -1,12 +1,20 @@
-// ============================================================
-//  שם האפליקציה — Service Worker
-//  EDIT: עדכן CACHE_NAME בכל deploy
-// ============================================================
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║           SERVICE WORKER — TEMPLATE                         ║
+ * ║  EDIT: שנה CACHE_NAME בכל עדכון גרסה                        ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
 
-const CACHE_NAME = 'app-v1.0.0';
+/* ════════════════════════════════════════
+   EDIT: עדכן את מספר הגרסה בכל deploy!
+   ════════════════════════════════════════ */
+var CACHE_NAME = 'app-v1.0.0';
 
-// EDIT: הוסף את כל הקבצים הסטטיים שלך
-const PRECACHE = [
+/* ════════════════════════════════════════
+   EDIT: רשימת הקבצים לשמירה אופליין
+   הוסף כאן את כל הנכסים הסטטיים שלך
+   ════════════════════════════════════════ */
+var STATIC_FILES = [
   '/',
   '/index.html',
   '/landing.html',
@@ -14,71 +22,135 @@ const PRECACHE = [
   '/icon.png',
   '/icon-192.png',
   '/icon-512.png',
-  /* '/app.js',   */
+  /* EDIT: הוסף קבצי JS, CSS, פונטים, תמונות */
+  /* '/app.js', */
   /* '/style.css', */
+  /* '/offline.html', */
 ];
 
-// ===== התקנה =====
-self.addEventListener('install', event => {
+/* ════════════════════════════════════════
+   INSTALL — שמור קבצים סטטיים
+   ════════════════════════════════════════ */
+self.addEventListener('install', function(event) {
+  console.log('[SW] Install:', CACHE_NAME);
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return Promise.allSettled(
-        PRECACHE.map(url =>
-          cache.add(url).catch(() => {
-            console.warn('[SW] לא נטמן:', url);
-          })
-        )
+    caches.open(CACHE_NAME).then(function(cache) {
+      /* ignoreSearch: true מאפשר cache-hit גם עם query params */
+      return cache.addAll(STATIC_FILES).catch(function(err) {
+        console.warn('[SW] Cache addAll partial fail:', err);
+      });
+    }).then(function() {
+      return self.skipWaiting(); /* הפעל SW חדש מיידית */
+    })
+  );
+});
+
+/* ════════════════════════════════════════
+   ACTIVATE — מחק cache ישן
+   ════════════════════════════════════════ */
+self.addEventListener('activate', function(event) {
+  console.log('[SW] Activate:', CACHE_NAME);
+  event.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.filter(function(k) { return k !== CACHE_NAME; })
+            .map(function(k)   { console.log('[SW] Delete old cache:', k); return caches.delete(k); })
       );
-    }).then(() => self.skipWaiting())
+    }).then(function() {
+      return self.clients.claim(); /* קח שליטה על כל הטאבים מיד */
+    })
   );
 });
 
-// ===== הפעלה — מחק cache ישן =====
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
+/* ════════════════════════════════════════
+   FETCH — אסטרטגיית Cache First עם Network Fallback
+   ════════════════════════════════════════ */
+self.addEventListener('fetch', function(event) {
+  var req = event.request;
 
-// ===== Fetch — Cache First + Network Fallback =====
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  /* דלג על בקשות לא-GET */
+  if (req.method !== 'GET') return;
 
-  const url = new URL(event.request.url);
-
-  // בקשות חיצוניות (APIs, CDN) — תמיד מהרשת
-  if (url.origin !== self.location.origin) return;
+  /* דלג על cross-origin (APIs חיצוניים, Firebase וכו') */
+  if (!req.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    caches.match(req).then(function(cached) {
       if (cached) {
-        // החזר מה-cache מיד, ועדכן ברקע
-        fetch(event.request).then(res => {
-          if (res && res.status === 200) {
-            caches.open(CACHE_NAME).then(c => c.put(event.request, res));
-          }
-        }).catch(() => {});
+        /* הגש מה-cache, ובמקביל עדכן ברקע (Stale-While-Revalidate) */
+        fetchAndCache(req);
         return cached;
       }
-
-      // אין cache — נסה רשת
-      return fetch(event.request).then(res => {
-        if (!res || res.status !== 200) return res;
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        return res;
-      }).catch(() => {
-        // אופליין לחלוטין — הגש index.html
-        if (event.request.destination === 'document') {
-          return caches.match('/index.html');
+      /* אין cache — נסה רשת */
+      return fetchAndCache(req).catch(function() {
+        /* אין רשת + אין cache — הגש offline fallback */
+        if (req.destination === 'document') {
+          return caches.match('/offline.html') ||
+                 new Response('<h1>אין חיבור לאינטרנט</h1>', {
+                   headers: { 'Content-Type': 'text/html; charset=utf-8' }
+                 });
         }
+        return new Response('', { status: 503 });
       });
     })
   );
 });
+
+function fetchAndCache(req) {
+  return fetch(req).then(function(res) {
+    /* שמור רק תשובות תקינות */
+    if (!res || res.status !== 200 || res.type !== 'basic') return res;
+    var clone = res.clone();
+    caches.open(CACHE_NAME).then(function(c) { c.put(req, clone); });
+    return res;
+  });
+}
+
+/* ════════════════════════════════════════
+   PUSH NOTIFICATIONS (אופציונלי)
+   EDIT: הסר אם לא צריך
+   ════════════════════════════════════════ */
+self.addEventListener('push', function(event) {
+  if (!event.data) return;
+  var data = event.data.json();
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'התראה', {
+      body:    data.body    || '',
+      icon:    data.icon    || '/icon-192.png',
+      badge:   data.badge   || '/icon-192.png',
+      tag:     data.tag     || 'default',
+      data:    data.url     || '/',
+      vibrate: [200, 100, 200],
+      dir:     'rtl',
+      lang:    'he'
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  var url = event.notification.data || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
+      for (var c of list) {
+        if (c.url === url && 'focus' in c) return c.focus();
+      }
+      return clients.openWindow(url);
+    })
+  );
+});
+
+/* ════════════════════════════════════════
+   BACKGROUND SYNC (אופציונלי)
+   EDIT: הסר אם לא צריך
+   ════════════════════════════════════════ */
+self.addEventListener('sync', function(event) {
+  if (event.tag === 'sync-data') {
+    event.waitUntil(syncData());
+  }
+});
+
+function syncData() {
+  /* EDIT: לוגיקת סנכרון נתונים בזמן חזרת אינטרנט */
+  return Promise.resolve();
+}

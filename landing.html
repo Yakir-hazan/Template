@@ -1,635 +1,845 @@
 <!--
-  Copyright (c) 2026 Yakir Hazan
-  All rights reserved.
-  Game concepts (Snake, Tetris, Pong, etc.) are classic games in the public domain.
-  All code, design and implementation are original and written from scratch.
-  This code may not be copied, modified, or distributed
-  without written permission from the author.
+  ╔══════════════════════════════════════════════════════════════╗
+  ║           PWA LANDING PAGE — TEMPLATE                       ║
+  ║  תבנית דף נחיתה + התקנת PWA                                 ║
+  ║  ————————————————————————————————————————————————————————    ║
+  ║  🔧 כל מה שצריך לשנות מסומן ב: <!-- EDIT: -->               ║
+  ╚══════════════════════════════════════════════════════════════╝
 -->
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>הממ"ד שלנו — הורד את האפליקציה</title>
-<meta name="description" content="משחקים, צלילים מרגיעים והתראות אזעקה — הכל במקום אחד">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- EDIT: שנה את הכותרת והתיאור -->
+<title>שם האפליקציה — הורד עכשיו</title>
+<meta name="description" content="תיאור קצר של האפליקציה — מה היא עושה ולמה כדאי להוריד">
+
+<!-- PWA -->
 <link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="הממ״ד שלנו">
+<!-- EDIT: שנה את שם האפליקציה -->
+<meta name="apple-mobile-web-app-title" content="שם האפליקציה">
+<!-- EDIT: עדכן נתיב האייקון -->
 <link rel="apple-touch-icon" href="/icon.png">
-<meta property="og:title" content="הממ״ד שלנו — הורד את האפליקציה">
-<meta property="og:description" content="משחקים, צלילים מרגיעים והתראות אזעקה — הכל במקום אחד">
-<meta property="og:image" content="https://raw.githubusercontent.com/Yakir-hazan/ShelterPlay/main/87F0A4F0-9A79-43F6-A503-F9971ADE1AB0.jpeg">
+<link rel="icon" type="image/png" href="/icon.png">
+
+<!-- Open Graph -->
+<!-- EDIT: עדכן OG tags לשיתוף ברשתות חברתיות -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="שם האפליקציה — הורד עכשיו">
+<meta property="og:description" content="תיאור קצר של האפליקציה">
+<meta property="og:image" content="https://your-domain.com/og-image.jpg">
+<meta property="og:url" content="https://your-domain.com">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Fonts -->
+<!-- EDIT: החלף בפונט שמתאים לפרויקט שלך -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
+/* ════════════════════════════════════════
+   DESIGN TOKENS — שנה את הצבעים לפרויקט שלך
+   ════════════════════════════════════════ */
 :root {
-  --bg:#060b14;--surface:#0d1525;--card:#111c2e;
-  --blue:#3b82f6;--teal:#00d4aa;--text:#f0f6ff;
-  --muted:#5a7090;--border:rgba(255,255,255,0.06);
-  --orange:#ff9f43;--green:#26de81;--purple:#7c3aed;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{
-  font-family:-apple-system,'Heebo',sans-serif;
-  background:var(--bg);color:var(--text);
-  min-height:100vh;overflow-x:hidden;
-  direction:rtl;
+  /* EDIT: פלטת צבעים */
+  --bg:         #08090f;
+  --surface:    #0e1117;
+  --card:       #141820;
+  --border:     rgba(255,255,255,0.07);
+  --text:       #eef2ff;
+  --muted:      #5c6b8a;
+
+  /* EDIT: צבעי מותג */
+  --primary:    #4f7cff;
+  --secondary:  #00c9a7;
+  --accent:     #9b5de5;
+
+  /* System */
+  --radius-lg:  20px;
+  --radius-md:  14px;
+  --radius-sm:  10px;
+  --shadow-glow: 0 0 40px rgba(79,124,255,0.18);
+  --font:       'Heebo', -apple-system, sans-serif;
 }
 
-/* BG */
-.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+/* ════════════ BASE ════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  direction: rtl;
+}
+
+/* ════════════ BACKGROUND ════════════ */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 50% at 75% 10%,rgba(59,130,246,0.10) 0%,transparent 70%),
-    radial-gradient(ellipse 50% 40% at 15% 85%,rgba(0,212,170,0.07) 0%,transparent 70%);}
-.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(59,130,246,0.03) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(59,130,246,0.03) 1px,transparent 1px);
-  background-size:44px 44px;
-  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);}
-
-.store-wrap{
-  position:relative;z-index:1;
-  max-width:480px;margin:0 auto;
-  padding:24px 16px 40px;
+    radial-gradient(ellipse 65% 55% at 80% 5%,  rgba(79,124,255,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 45% at 10% 90%, rgba(0,201,167,0.08)  0%, transparent 65%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, rgba(155,93,229,0.05) 0%, transparent 65%);
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%);
 }
 
-/* ===== HEADER ===== */
-.app-header{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:18px;padding-bottom:18px;
-  border-bottom:0.5px solid var(--border);
-  direction:rtl;
-}
-.app-header-text{flex:1;text-align:right;}
-.app-icon{
-  width:76px;height:76px;border-radius:20px;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;flex-shrink:0;
-  box-shadow:0 8px 28px rgba(59,130,246,0.45),0 0 0 1px rgba(255,255,255,0.08);
-}
-.app-icon img{width:100%;height:100%;object-fit:cover;}
-.app-title{font-size:19px;font-weight:900;color:var(--text);margin-bottom:3px;letter-spacing:-0.4px;}
-.app-sub{font-size:13px;color:var(--muted);margin-bottom:10px;}
-.install-btn{
-  display:inline-block;
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  color:#fff;border:none;border-radius:22px;
-  padding:8px 24px;font-size:14px;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  box-shadow:0 4px 18px rgba(59,130,246,0.45);
-  transition:all 0.2s;
-}
-.install-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,130,246,0.55);}
-.install-btn.done{background:linear-gradient(135deg,#26de81,#00b368);box-shadow:0 4px 18px rgba(38,222,129,0.4);}
-.install-btn.hidden{display:none;}
-.popup-step-num.android-num{background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.3);color:#00d4aa;}
-
-/* ===== LIVE BADGE ===== */
-.live-badge{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.22);
-  border-radius:50px;padding:6px 16px;
-  font-size:12px;font-weight:700;color:var(--teal);
-  margin-bottom:18px;width:fit-content;margin-left:auto;margin-right:auto;
-}
-.live-dot-badge{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--green);box-shadow:0 0 7px var(--green);
-  animation:livePulse 2s ease-in-out infinite;
-}
-@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.7);}}
-
-/* ===== RATING ROW ===== */
-.rating-row{
-  display:flex;gap:0;margin-bottom:22px;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;overflow:hidden;
-}
-.rating-item{
-  text-align:center;flex:1;padding:13px 6px;
-  border-left:0.5px solid var(--border);
-}
-.rating-item:last-child{border-left:none;}
-.rating-num{font-size:20px;font-weight:900;color:var(--text);line-height:1;}
-.rating-label{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;}
-.stars{color:var(--orange);font-size:10px;margin:2px 0 1px;}
-
-/* ===== SCREENS LABEL ===== */
-.screens-label{
-  font-size:11px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--muted);
-  margin-bottom:14px;display:flex;align-items:center;gap:10px;
-}
-.screens-label::before,.screens-label::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ===== PHONES SCROLL ===== */
-.screens-scroll{
-  display:flex;gap:12px;
-  overflow-x:auto;padding-bottom:10px;
-  scrollbar-width:none;direction:ltr;
-  margin-bottom:14px;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-}
-.screens-scroll::-webkit-scrollbar{display:none;}
-
-/* ===== PHONE FRAME ===== */
-.phone-frame{
-  flex-shrink:0;width:155px;
-  border-radius:26px;border:2px solid rgba(255,255,255,0.1);
-  overflow:hidden;background:#0a1020;position:relative;
-  aspect-ratio:9/19.5;
-  box-shadow:0 0 0 1px rgba(255,255,255,0.04),0 16px 48px rgba(0,0,0,0.65),0 0 30px rgba(59,130,246,0.1);
-  scroll-snap-align:start;
-}
-.phone-notch{
-  position:absolute;top:8px;left:50%;transform:translateX(-50%);
-  width:42px;height:6px;background:#000;border-radius:6px;z-index:10;
-}
-.screen{width:100%;height:100%;display:flex;flex-direction:column;padding:22px 10px 14px;direction:rtl;}
-
-/* Screen 1 */
-.s1{background:#060b14;}
-.s1-top{text-align:center;padding:8px 0 6px;}
-.s1-badge{display:inline-block;background:rgba(255,50,50,0.15);border:1px solid rgba(255,80,80,0.3);border-radius:20px;padding:2px 10px;font-size:7px;font-weight:700;color:#ff6b6b;margin-bottom:4px;}
-.s1-appname{font-size:11px;font-weight:900;color:#f0f6ff;margin-bottom:2px;}
-.s1-city{font-size:8px;color:#5a7090;margin-bottom:8px;}
-.s1-alert{background:linear-gradient(135deg,rgba(229,62,62,0.2),rgba(197,48,48,0.1));border:1.5px solid rgba(229,62,62,0.4);border-radius:10px;padding:8px 10px;margin-bottom:8px;animation:alertPulse 2s ease-in-out infinite;}
-@keyframes alertPulse{0%,100%{border-color:rgba(229,62,62,0.4);}50%{border-color:rgba(229,62,62,0.8);box-shadow:0 0 12px rgba(229,62,62,0.15);}}
-.s1-alert-title{font-size:9px;font-weight:900;color:#ff6b6b;margin-bottom:3px;}
-.s1-alert-text{font-size:7.5px;color:#ffb3b3;line-height:1.4;}
-.s1-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.s1-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:7px 5px;text-align:center;}
-.s1-card-icon{font-size:14px;margin-bottom:2px;}
-.s1-card-name{font-size:7px;color:#a0b8d0;font-weight:700;}
-
-/* Screen 2 */
-.s2{background:#070d1a;}
-.s2-header{font-size:11px;font-weight:900;color:#f0f6ff;margin-bottom:8px;text-align:center;}
-.s2-game{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 8px;margin-bottom:5px;}
-.s2-game-icon{font-size:14px;}
-.s2-game-name{font-size:8px;font-weight:700;color:#e8f0ff;}
-.s2-game-desc{font-size:6.5px;color:#5a7090;margin-top:1px;}
-.s2-tetris{margin-top:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:7px;}
-.tetris-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;}
-.tc{aspect-ratio:1;border-radius:2px;}
-
-/* Screen 3 */
-.s3{background:#060c18;}
-.s3-header{font-size:11px;font-weight:900;color:#f0f6ff;margin-bottom:8px;text-align:center;}
-.s3-sound{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 8px;margin-bottom:5px;}
-.s3-icon{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.s3-name{font-size:8px;font-weight:700;color:#e8f0ff;}
-.s3-sub{font-size:6.5px;color:#5a7090;margin-top:1px;}
-.s3-play{margin-right:auto;width:20px;height:20px;border-radius:50%;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.play-tri{width:0;height:0;border-style:solid;border-width:4px 0 4px 7px;border-color:transparent transparent transparent #3b82f6;margin-right:-1px;}
-.s3-wave{display:flex;align-items:center;gap:2px;justify-content:center;margin-top:auto;padding-top:6px;}
-.wave-bar{width:3px;border-radius:2px;background:linear-gradient(to top,#3b82f6,#00d4aa);animation:waveAnim 1.2s ease-in-out infinite alternate;}
-@keyframes waveAnim{from{transform:scaleY(0.4);opacity:0.5;}to{transform:scaleY(1);opacity:1;}}
-
-/* Screen 4 */
-.s4{background:#060b14;}
-.s4-header{font-size:11px;font-weight:900;color:#f0f6ff;margin-bottom:8px;text-align:center;}
-.s4-member{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 8px;margin-bottom:4px;}
-.s4-avatar{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;}
-.s4-name{font-size:8px;font-weight:700;color:#e8f0ff;}
-.s4-status{font-size:6.5px;margin-top:1px;}
-.s4-dot{width:6px;height:6px;border-radius:50%;margin-right:auto;flex-shrink:0;}
-.s4-sos{margin-top:auto;background:linear-gradient(135deg,rgba(229,62,62,0.2),rgba(197,48,48,0.1));border:1px solid rgba(229,62,62,0.35);border-radius:8px;padding:6px;font-size:7.5px;font-weight:800;color:#ff6b6b;text-align:center;}
-
-/* Scroll dots */
-.scroll-dots{display:flex;justify-content:center;gap:5px;margin-bottom:22px;}
-.scroll-dot{height:5px;border-radius:3px;background:var(--border);transition:all 0.3s;width:5px;}
-.scroll-dot.active{background:var(--blue);width:14px;}
-
-/* ===== DIVIDER ===== */
-.sec-divider{
-  font-size:11px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--muted);
-  margin-bottom:14px;display:flex;align-items:center;gap:10px;
-}
-.sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ===== DESCRIPTION ===== */
-.desc-box{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:16px;margin-bottom:20px;
-}
-.desc-text{font-size:13px;color:#8ba4c0;line-height:1.75;}
-
-/* ===== WHAT'S NEW ===== */
-.what-new{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:16px;margin-bottom:20px;
-}
-.version-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.version-tag{font-size:13px;font-weight:800;color:var(--text);}
-.version-date{font-size:11px;color:var(--muted);}
-.update-item{font-size:12px;color:#8ba4c0;line-height:1.9;}
-.update-item span{color:var(--teal);font-weight:700;}
-
-/* ===== TAGS ===== */
-.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
-.tag{
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
-  border-radius:20px;padding:5px 14px;
-  font-size:12px;color:var(--muted);font-weight:600;
+/* ════════════ LAYOUT ════════════ */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 18px 60px;
 }
 
-/* ===== FOOTER ===== */
-.footer{text-align:center;padding:20px 0 16px;border-top:1px solid var(--border);}
-.footer-made{font-size:11px;font-weight:500;color:var(--muted);margin-bottom:10px;line-height:1.5;}
-.footer-made strong{color:var(--text);}
-.footer-links{display:flex;justify-content:center;align-items:center;gap:0;margin-bottom:12px;flex-wrap:wrap;}
-.footer-links a{font-size:10px;font-weight:500;color:#3b82f6;text-decoration:none;padding:0 10px;}
-.footer-links a:hover{text-decoration:underline;}
-.footer-divider{width:1px;height:10px;background:rgba(255,255,255,0.15);}
-.footer-copy{font-size:9px;color:var(--muted);line-height:1.6;opacity:0.5;}
+/* ════════════ HEADER — App Info ════════════ */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.app-icon {
+  width: 80px; height: 80px;
+  border-radius: 22px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8px 32px rgba(79,124,255,0.4), 0 0 0 1px rgba(255,255,255,0.08);
+  /* EDIT: אם אין תמונה — הסר את ה-img ושנה את הרקע */
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px;
+}
+.app-icon img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ===== INSTALL POPUP ===== */
-#installPopup{display:none;position:fixed;inset:0;z-index:2000;align-items:flex-end;justify-content:center;padding:0;}
-#installPopup.active{display:flex;}
-#popupOverlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeInOverlay 0.3s ease;}
-@keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
-#popupBox{position:relative;z-index:1;width:100%;max-width:480px;background:linear-gradient(180deg,#111c2e 0%,#0d1525 100%);border-radius:28px 28px 0 0;border-top:1px solid rgba(255,255,255,0.1);padding:10px 24px 40px;animation:slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 -20px 60px rgba(0,0,0,0.5);}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-#popupHandle{width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px;}
-#popupClose{position:absolute;top:18px;left:20px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
-#popupClose:hover{background:rgba(255,255,255,0.15);}
-.popup-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;box-shadow:0 6px 20px rgba(59,130,246,0.35);}
-.popup-title{text-align:center;font-size:20px;font-weight:900;color:#f0f6ff;margin-bottom:6px;letter-spacing:-0.5px;}
-.popup-sub{text-align:center;font-size:13px;color:#5a7090;margin-bottom:22px;line-height:1.5;}
-.popup-steps{display:none;}
-.popup-steps.active{display:flex;flex-direction:column;gap:12px;}
-.popup-step{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:13px 14px;}
-.popup-step-num{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:1px;}
-.popup-step-num.ios-num{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#3b82f6;}
-.popup-step-txt{font-size:13px;color:#a0b0c8;line-height:1.6;flex:1;}
-.popup-step-txt strong{color:#f0f6ff;}
-.popup-step-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
-.popup-btn{width:100%;padding:15px;margin-top:20px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;border-radius:16px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 24px rgba(59,130,246,0.4);transition:all 0.2s;}
-.popup-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(59,130,246,0.5);}
+.app-meta { flex: 1; }
+/* EDIT: שנה את שם האפליקציה */
+.app-name {
+  font-size: 20px; font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+/* EDIT: שנה את תת-הכותרת */
+.app-tagline { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; }
+
+/* ════════════ INSTALL BUTTON ════════════ */
+.install-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  border: none; border-radius: 50px;
+  padding: 9px 22px;
+  font-size: 14px; font-weight: 800;
+  font-family: var(--font);
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(79,124,255,0.45);
+  transition: transform 0.18s, box-shadow 0.18s;
+  white-space: nowrap;
+}
+.install-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(79,124,255,0.55); }
+.install-btn:active { transform: translateY(0); }
+.install-btn.done   {
+  background: linear-gradient(135deg, #26de81, #00b368);
+  box-shadow: 0 4px 20px rgba(38,222,129,0.4);
+  pointer-events: none;
+}
+.install-btn.hidden { display: none; }
+
+/* ════════════ LIVE BADGE ════════════ */
+.live-badge {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; width: fit-content;
+  margin: 0 auto 20px;
+  background: rgba(0,201,167,0.08);
+  border: 1px solid rgba(0,201,167,0.22);
+  border-radius: 50px;
+  padding: 6px 18px;
+  font-size: 12px; font-weight: 700; color: var(--secondary);
+}
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #26de81;
+  box-shadow: 0 0 8px #26de81;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+/* EDIT: שנה את טקסט הבאדג' */
+
+/* ════════════ STATS ROW ════════════ */
+.stats-row {
+  display: flex;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 14px 6px;
+  border-left: 1px solid var(--border);
+}
+.stat-item:last-child { border-left: none; }
+.stat-val { font-size: 20px; font-weight: 900; line-height: 1; }
+.stat-lbl { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+.stat-stars { color: #ffc107; font-size: 10px; margin: 2px 0 1px; }
+/* EDIT: שנה את המספרים בה-HTML למטה */
+
+/* ════════════ SECTION LABEL ════════════ */
+.section-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.section-label::before, .section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ════════════ SCREENSHOT CAROUSEL ════════════ */
+.screens-scroll {
+  display: flex; gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+  direction: ltr;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.screens-scroll::-webkit-scrollbar { display: none; }
+
+.phone-frame {
+  flex-shrink: 0; width: 150px;
+  border-radius: 28px;
+  border: 2px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+  background: #0a0d15;
+  aspect-ratio: 9/19.5;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  scroll-snap-align: start;
+  position: relative;
+}
+.phone-notch {
+  position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+  width: 44px; height: 6px;
+  background: #000; border-radius: 6px; z-index: 10;
+}
+/* EDIT: עצב את מסכי הפרוומו שלך בתוך .screen-N */
+.screen-content {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  padding: 24px 10px 12px;
+  direction: rtl;
+}
+
+/* ════════════ SCROLL DOTS ════════════ */
+.scroll-dots {
+  display: flex; justify-content: center; gap: 6px;
+  margin-bottom: 28px;
+}
+.dot {
+  height: 5px; border-radius: 5px;
+  background: rgba(255,255,255,0.12);
+  transition: all 0.25s;
+  width: 5px;
+}
+.dot.active { background: var(--primary); width: 14px; }
+
+/* ════════════ FEATURES LIST ════════════ */
+.features {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 28px;
+}
+.feature-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.feature-item:hover { border-color: rgba(79,124,255,0.25); }
+.feature-icon { font-size: 22px; flex-shrink: 0; width: 36px; text-align: center; }
+.feature-text { flex: 1; }
+.feature-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.feature-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
+/* EDIT: שנה את הפיצ'רים למטה בה-HTML */
+
+/* ════════════ CTA BOTTOM ════════════ */
+.cta-bottom {
+  background: linear-gradient(135deg, rgba(79,124,255,0.1), rgba(155,93,229,0.08));
+  border: 1px solid rgba(79,124,255,0.2);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+.cta-bottom h3 { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+.cta-bottom p  { font-size: 13px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+
+/* ════════════ FOOTER ════════════ */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex; justify-content: center; gap: 20px;
+  flex-wrap: wrap;
+}
+.footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.footer a:hover { color: var(--primary); }
+
+/* ════════════ INSTALL POPUP ════════════ */
+.popup-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 900;
+  backdrop-filter: blur(6px);
+}
+.popup-overlay.active { display: flex; align-items: flex-end; }
+
+.popup-sheet {
+  background: var(--card);
+  border-radius: 28px 28px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 20px 20px 44px;
+  width: 100%;
+  animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.popup-handle {
+  width: 40px; height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  margin: 0 auto 20px;
+}
+.popup-title { font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 4px; }
+.popup-sub   { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 20px; line-height: 1.5; }
+
+.popup-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.popup-step  {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.popup-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900; flex-shrink: 0;
+}
+.num-ios     { background: rgba(79,124,255,0.15); border: 1px solid rgba(79,124,255,0.3); color: var(--primary); }
+.num-android { background: rgba(0,201,167,0.15); border: 1px solid rgba(0,201,167,0.3); color: var(--secondary); }
+
+.popup-step-txt  { flex: 1; font-size: 13px; line-height: 1.45; }
+.popup-step-icon { font-size: 20px; flex-shrink: 0; }
+
+.popup-steps-ios     { display: none; }
+.popup-steps-android { display: none; }
+.popup-steps-ios.active,
+.popup-steps-android.active { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+.popup-btn {
+  width: 100%; padding: 15px;
+  border: none; border-radius: var(--radius-md);
+  font-size: 15px; font-weight: 800;
+  font-family: var(--font);
+  color: #fff; cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: 0 6px 24px rgba(79,124,255,0.4);
+  transition: transform 0.15s;
+}
+.popup-btn:active { transform: scale(0.98); }
+
+/* ════════════ MODAL ════════════ */
+#modalOverlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+#modal {
+  display: none; position: fixed;
+  bottom: 0; left: 0; right: 0; z-index: 1001;
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 48px;
+  max-height: 80vh; overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+.modal-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius:2px; margin: 0 auto 20px; }
+#modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+#modal p  { font-size: 13px; color: var(--muted); line-height: 1.8; }
+.modal-close {
+  margin-top: 24px; width: 100%; padding: 13px;
+  background: rgba(79,124,255,0.1); border: 1px solid rgba(79,124,255,0.25);
+  border-radius: var(--radius-md); color: var(--primary);
+  font-size: 14px; font-weight: 700; font-family: var(--font); cursor: pointer;
+}
+
+/* ════════════ RESPONSIVE ════════════ */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
-<div class="bg-layer"></div>
-<div class="grid-bg"></div>
 
-<div class="store-wrap">
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
 
-  <!-- HEADER -->
+<div class="wrap">
+
+  <!-- ══ HEADER ══ -->
   <div class="app-header">
     <div class="app-icon">
-      <svg width="76" height="76" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="shieldOuter" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6B8FE8"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
-          <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0D1B2A"/><stop offset="100%" stop-color="#111827"/></linearGradient>
-          <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6B8FE8"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
-          <filter id="softGlow"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="starGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <rect width="400" height="400" rx="60" fill="url(#bgGrad)"/>
-        <path d="M200,38 L338,105 L338,235 Q338,310 200,368 Q62,310 62,235 L62,105 Z" fill="url(#shieldOuter)" filter="url(#softGlow)"/>
-        <path d="M200,55 L322,115 L322,233 Q322,298 200,350 Q78,298 78,233 L78,115 Z" fill="#1B2A4A"/>
-        <path d="M200,72 L308,127 L308,232 Q308,287 200,333 Q92,287 92,232 L92,127 Z" fill="white" opacity="0.95"/>
-        <g filter="url(#starGlow)">
-          <polygon points="200,117 277.94,252 122.06,252" fill="none" stroke="url(#starGrad)" stroke-width="13" stroke-linejoin="round" stroke-linecap="round"/>
-          <polygon points="200,297 122.06,162 277.94,162" fill="none" stroke="url(#starGrad)" stroke-width="13" stroke-linejoin="round" stroke-linecap="round"/>
-        </g>
-      </svg>
+      <!-- EDIT: החלף באייקון שלך: <img src="/icon.png" alt=""> -->
+      🛡️
     </div>
-    <div class="app-header-text">
-      <div class="app-title">הממ"ד שלנו</div>
-      <div class="app-sub">ביטחון · משחקים · שלווה</div>
-      <button id="heroInstallBtn" class="install-btn" onclick="heroInstall()">הורד חינם</button>
+    <div class="app-meta">
+      <!-- EDIT: שנה שם ותיאור -->
+      <div class="app-name">שם האפליקציה</div>
+      <div class="app-tagline">תיאור קצר שמסביר את הערך של האפליקציה</div>
+      <button class="install-btn" id="heroInstallBtn" onclick="heroInstall()">
+        📲 הורד חינם
+      </button>
     </div>
   </div>
 
-  <!-- RATING ROW: 4.8 / #1 / חינם / +4 -->
-  <div class="rating-row">
-    <div class="rating-item">
-      <div class="rating-num">4.8</div>
-      <div class="stars">★★★★★</div>
-      <div class="rating-label">דירוג</div>
+  <!-- ══ LIVE BADGE ══ -->
+  <div class="live-badge">
+    <span class="live-dot"></span>
+    <!-- EDIT: שנה את הטקסט -->
+    זמין עכשיו · גרסה 1.0
+  </div>
+
+  <!-- ══ STATS ══ -->
+  <div class="stats-row">
+    <!-- EDIT: שנה מספרים וטקסטים -->
+    <div class="stat-item">
+      <div class="stat-val">4.9</div>
+      <div class="stat-stars">★★★★★</div>
+      <div class="stat-lbl">דירוג</div>
     </div>
-    <div class="rating-item">
-      <div class="rating-num" style="color:var(--blue)">#1</div>
-      <div class="rating-label">כלי ביטחון</div>
+    <div class="stat-item">
+      <div class="stat-val">חינם</div>
+      <div class="stat-lbl">מחיר</div>
     </div>
-    <div class="rating-item">
-      <div class="rating-num" style="color:var(--teal)">חינם</div>
-      <div class="rating-label">ללא רכישות</div>
+    <div class="stat-item">
+      <div class="stat-val">1K+</div>
+      <div class="stat-lbl">משתמשים</div>
     </div>
-    <div class="rating-item">
-      <div class="rating-num">+4</div>
-      <div class="rating-label">גיל</div>
+    <div class="stat-item">
+      <div class="stat-val">iOS&Android</div>
+      <div class="stat-lbl">פלטפורמות</div>
     </div>
   </div>
 
-  <!-- SCREENS -->
-  <div class="screens-label">תצוגה מקדימה</div>
-  <div class="screens-scroll" id="phonesScroll">
+  <!-- ══ SCREENSHOTS ══ -->
+  <div class="section-label">תמונות מסך</div>
 
-    <!-- Phone 1: Home -->
+  <div class="screens-scroll" id="screensScroll">
+    <!-- EDIT: עצב 3–4 מסכי פרוומו שמייצגים את האפליקציה שלך -->
+
+    <!-- מסך 1 -->
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <img src="https://i.ibb.co/s9Qcp3bm/IMG-7770.png" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div class="screen-content" style="background:#08090f;">
+        <!-- EDIT: תוכן מסך 1 — דף הבית של האפליקציה -->
+        <div style="text-align:center;padding:10px 0 8px;">
+          <div style="font-size:11px;font-weight:900;color:#eef2ff;margin-bottom:4px;">שם האפליקציה</div>
+          <div style="font-size:8px;color:#5c6b8a;">מסך ראשי</div>
+        </div>
+        <div style="background:rgba(79,124,255,0.12);border:1px solid rgba(79,124,255,0.3);border-radius:10px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:9px;font-weight:700;color:#4f7cff;margin-bottom:3px;">כותרת פיצ'ר</div>
+          <div style="font-size:7.5px;color:#8fa0c0;line-height:1.4;">תיאור קצר של הפיצ'ר הראשי</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1;">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 5px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:2px;">⭐</div>
+            <div style="font-size:7px;color:#8a96b8;">פיצ'ר A</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 5px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:2px;">🎯</div>
+            <div style="font-size:7px;color:#8a96b8;">פיצ'ר B</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 5px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:2px;">🔔</div>
+            <div style="font-size:7px;color:#8a96b8;">פיצ'ר C</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 5px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:2px;">💎</div>
+            <div style="font-size:7px;color:#8a96b8;">פיצ'ר D</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Phone 2: Games -->
+    <!-- מסך 2 -->
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <img src="https://i.ibb.co/wZgq7wzk/IMG-8079.png" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div class="screen-content" style="background:#08090f;">
+        <!-- EDIT: תוכן מסך 2 -->
+        <div style="text-align:center;padding:8px 0 12px;">
+          <div style="font-size:28px;margin-bottom:6px;">🎮</div>
+          <div style="font-size:10px;font-weight:900;color:#eef2ff;margin-bottom:2px;">פיצ'ר מרכזי</div>
+          <div style="font-size:7px;color:#5c6b8a;">תיאור קצר</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+          <div style="background:linear-gradient(135deg,rgba(79,124,255,0.15),rgba(155,93,229,0.1));border:1px solid rgba(79,124,255,0.25);border-radius:10px;padding:10px;">
+            <div style="font-size:8px;font-weight:700;color:#4f7cff;">פריט 1</div>
+            <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:6px;overflow:hidden;">
+              <div style="width:75%;height:100%;background:var(--primary);border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;">
+            <div style="font-size:8px;font-weight:700;color:#eef2ff;">פריט 2</div>
+            <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:6px;overflow:hidden;">
+              <div style="width:45%;height:100%;background:#00c9a7;border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;">
+            <div style="font-size:8px;font-weight:700;color:#eef2ff;">פריט 3</div>
+            <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:6px;overflow:hidden;">
+              <div style="width:60%;height:100%;background:#9b5de5;border-radius:4px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Phone 3: Sounds -->
+    <!-- מסך 3 -->
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <img src="https://i.ibb.co/chLkzMdQ/IMG-8070.png" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div class="screen-content" style="background:#08090f;">
+        <!-- EDIT: תוכן מסך 3 -->
+        <div style="text-align:center;padding:10px 0 14px;">
+          <div style="font-size:26px;margin-bottom:6px;">🔔</div>
+          <div style="font-size:10px;font-weight:900;color:#eef2ff;margin-bottom:2px;">התראות</div>
+          <div style="font-size:7px;color:#5c6b8a;">בזמן אמת</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:rgba(255,80,80,0.12);border:1.5px solid rgba(255,80,80,0.3);border-radius:9px;padding:8px 10px;">
+            <div style="font-size:8px;font-weight:900;color:#ff6b6b;margin-bottom:2px;">🚨 התראה חשובה</div>
+            <div style="font-size:7px;color:#ffb3b3;line-height:1.4;">תיאור קצר של ההתראה</div>
+          </div>
+          <div style="background:rgba(38,222,129,0.08);border:1px solid rgba(38,222,129,0.2);border-radius:9px;padding:8px 10px;">
+            <div style="font-size:8px;font-weight:900;color:#26de81;margin-bottom:2px;">✅ הכל תקין</div>
+            <div style="font-size:7px;color:#80f0b8;line-height:1.4;">מצב תקין</div>
+          </div>
+          <div style="background:rgba(79,124,255,0.1);border:1px solid rgba(79,124,255,0.2);border-radius:9px;padding:8px 10px;">
+            <div style="font-size:8px;font-weight:900;color:#4f7cff;margin-bottom:2px;">ℹ️ עדכון</div>
+            <div style="font-size:7px;color:#8aadff;line-height:1.4;">עדכון חדש זמין</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Phone 4: Family -->
+    <!-- מסך 4 -->
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <img src="https://i.ibb.co/Qj3BPDLX/IMG-8084.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div class="screen-content" style="background:#08090f;">
+        <!-- EDIT: תוכן מסך 4 -->
+        <div style="text-align:center;padding:10px 0 14px;">
+          <div style="font-size:26px;margin-bottom:6px;">⚙️</div>
+          <div style="font-size:10px;font-weight:900;color:#eef2ff;margin-bottom:2px;">הגדרות</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:8px;color:#eef2ff;">הגדרה 1</div>
+            <div style="width:24px;height:14px;background:#4f7cff;border-radius:7px;position:relative;"><div style="position:absolute;right:2px;top:2px;width:10px;height:10px;background:#fff;border-radius:50%;"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:8px;color:#eef2ff;">הגדרה 2</div>
+            <div style="width:24px;height:14px;background:rgba(255,255,255,0.1);border-radius:7px;position:relative;"><div style="position:absolute;left:2px;top:2px;width:10px;height:10px;background:#fff;border-radius:50%;opacity:0.4;"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:8px;color:#eef2ff;">שפה</div>
+            <div style="font-size:7px;color:#5c6b8a;">עברית ›</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </div>
+  </div><!-- /screens-scroll -->
 
-  <!-- Scroll dots -->
+  <!-- Dots -->
   <div class="scroll-dots">
-    <div class="scroll-dot active" id="dot0"></div>
-    <div class="scroll-dot" id="dot1"></div>
-    <div class="scroll-dot" id="dot2"></div>
-    <div class="scroll-dot" id="dot3"></div>
+    <div class="dot active" id="dot0"></div>
+    <div class="dot" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
   </div>
 
-  <!-- DESCRIPTION -->
-  <div class="sec-divider">תיאור</div>
-  <div class="desc-box">
-    <p class="desc-text">אפליקציית הממ״ד שלנו נוצרה כדי לתת לכם ביטחון ורוגע ברגעים לחוצים.</p>
-    <br>
-    <p class="desc-text">התקנת האפליקציה היא ללא חנות אפליקציות אלא ישירות מאתר הבית על ידי לחיצה על כפתור ״הורד חינם״</p>
-    <br>
-    <p class="desc-text">📵 <strong style="color:var(--text)">עובד גם בלי אינטרנט</strong><br>
-    • משחקים ופעילויות לילדים ולהורים<br>
-    • תרגילי נשימה להורדת לחץ<br>
-    • צלילים מרגיעים להפחתת חרדה<br>
-    כל מה שצריך כדי להעביר את הזמן בממ״ד בצורה רגועה ונעימה</p>
-    <br>
-    <p class="desc-text">🌐 <strong style="color:var(--text)">פיצ'רים מתקדמים שדורשים חיבור לרשת</strong><br>
-    • 🚨 התראות אזעקה בזמן אמת<br>
-    • 🆘 כפתור SOS לשליחת הודעת WhatsApp עם מיקום מדויק לאנשי קשר שהוגדרו מראש<br>
-    • 👨‍👩‍👧‍👦 סטטוס משפחתי — לראות מי מבני המשפחה נכנס למרחב מוגן בזמן אמת</p>
-    <br>
-    <p class="desc-text">אפליקציה אחת שמחברת בין בטיחות, והנאה ביחד בזמנים לא רגילים</p>
-  </div>
+  <!-- ══ FEATURES ══ -->
+  <div class="section-label">למה להוריד?</div>
 
-  <!-- WHAT'S NEW -->
-  <div class="what-new">
-    <div class="version-row">
-      <span class="version-tag">מה חדש — גרסה 2.0.1</span>
-      <span class="version-date">מרץ 2026</span>
+  <div class="features">
+    <!-- EDIT: שנה את הפיצ'רים לפי הפרויקט שלך -->
+    <div class="feature-item">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-text">
+        <div class="feature-title">מהיר ונוח</div>
+        <div class="feature-desc">עובד גם ללא אינטרנט, ישירות ממסך הבית</div>
+      </div>
     </div>
-    <div class="update-item">
-      • <span>כפתור SOS</span> — שליחת הודעת מצוקה ל-WhatsApp כולל מיקום GPS לרשימת אנשי קשר שהוגדרו מראש<br>
-      • <span>סטטוס משפחתי</span> — מאפשר להתעדכן לגבי משפחה או חברים בזמן אמת שכולם נמצאים במרחב מוגן
+    <div class="feature-item">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-text">
+        <div class="feature-title">התראות בזמן אמת</div>
+        <div class="feature-desc">קבל עדכונים חשובים ישירות לטלפון</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-text">
+        <div class="feature-title">פרטיות מלאה</div>
+        <div class="feature-desc">לא נאסף ולא נשמר שום מידע אישי</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">💸</div>
+      <div class="feature-text">
+        <div class="feature-title">חינם לגמרי</div>
+        <div class="feature-desc">ללא רישום, ללא App Store, ללא תשלום</div>
+      </div>
     </div>
   </div>
 
-  <!-- TAGS -->
-  <div class="tag-row">
-    <span class="tag">חירום</span>
-    <span class="tag">פיקוד העורף</span>
-    <span class="tag">משחקים</span>
-    <span class="tag">ממ״ד</span>
-    <span class="tag">PWA</span>
+  <!-- ══ CTA BOTTOM ══ -->
+  <div class="cta-bottom">
+    <!-- EDIT: שנה טקסט CTA -->
+    <h3>מוכן/ת להתחיל? 🚀</h3>
+    <p>התקן/י את האפליקציה בשניות — ישירות מהדפדפן, ללא App Store</p>
+    <button class="install-btn" onclick="heroInstall()" style="font-size:16px;padding:12px 32px;">
+      📲 הוסף למסך הבית
+    </button>
   </div>
 
-  <!-- FOOTER -->
+  <!-- ══ FOOTER ══ -->
   <div class="footer">
-    <p class="footer-made">האתר נוצר ועוצב מהלב ❤️ על ידי <strong>Yakir Hazan</strong></p>
-    <div class="footer-links">
-      <a href="#" onclick="openModal('about');return false;">אודות האתר</a>
-      <div class="footer-divider"></div>
-      <a href="#" onclick="openModal('privacy');return false;">מדיניות פרטיות</a>
-      <div class="footer-divider"></div>
-      <a href="#" onclick="openModal('terms');return false;">תנאי שימוש</a>
-    </div>
-    <p class="footer-copy">© 2026 Yakir Hazan — כל הזכויות שמורות. העיצוב והקוד מוגנים בזכויות יוצרים.<br>רעיונות המשחקים הקלאסיים והאימוגים שייכים ליוצריהם המקוריים.</p>
+    <!-- EDIT: עדכן שמות ולינקים -->
+    <a href="#" onclick="openModal('about');return false;">אודות</a>
+    <a href="#" onclick="openModal('privacy');return false;">פרטיות</a>
+    <a href="#" onclick="openModal('terms');return false;">תנאי שימוש</a>
+    <!-- EDIT: שנה לינק יצירת קשר -->
+    <a href="https://m.me/your-page" target="_blank">צור קשר</a>
   </div>
 
-</div>
+</div><!-- /wrap -->
 
+<!-- ══ INSTALL POPUP ══ -->
+<div class="popup-overlay" id="installPopup" onclick="if(event.target===this)closeInstallPopup()">
+  <div class="popup-sheet" onclick="event.stopPropagation()">
+    <div class="popup-handle"></div>
+    <div class="popup-title">📲 הוסף למסך הבית</div>
+    <!-- EDIT: שנה תת-כותרת -->
+    <div class="popup-sub" id="popupSub">התקן את האפליקציה בשניות — בחינם, ללא App Store</div>
 
-<!-- INSTALL POPUP -->
-<div id="installPopup">
-  <div id="popupOverlay" onclick="closeInstallPopup()"></div>
-  <div id="popupBox">
-    <div id="popupHandle"></div>
-    <button id="popupClose" onclick="closeInstallPopup()">✕</button>
-    <div class="popup-icon">🏠</div>
-    <div class="popup-title">הוסף לדף הבית</div>
-    <div class="popup-sub">התקן את הממ"ד שלנו בשניות — בחינם, ללא App Store</div>
-    <div class="popup-steps active" id="stepsIOS">
+    <!-- iOS Steps -->
+    <div class="popup-steps-ios" id="stepsIOS">
       <div class="popup-step">
-        <div class="popup-step-num ios-num">1</div>
-        <div class="popup-step-txt">פתח את האתר <strong>בדפדפן Safari</strong></div>
-        <div class="popup-step-icon">🧭</div>
+        <div class="popup-step-num num-ios">1</div>
+        <div class="popup-step-txt">לחץ/י על כפתור <strong>שתף</strong> <span style="font-size:16px">⎙</span> בתחתית Safari</div>
+        <div class="popup-step-icon">⎙</div>
       </div>
       <div class="popup-step">
-        <div class="popup-step-num ios-num">2</div>
-        <div class="popup-step-txt">לחץ/י על כפתור <strong>השיתוף</strong> <svg style="display:inline;vertical-align:middle;margin:0 3px" width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M8 7l4-4 4 4" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v5a1 1 0 001 1h14a1 1 0 001-1v-5" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round"/></svg> <strong>בתחתית Safari</strong></div>
-        <div class="popup-step-icon">📤</div>
-      </div>
-      <div class="popup-step">
-        <div class="popup-step-num ios-num">3</div>
-        <div class="popup-step-txt">גלול/י למטה ← <strong>"הוסף למסך הבית"</strong></div>
+        <div class="popup-step-num num-ios">2</div>
+        <div class="popup-step-txt">גלול/י מטה ובחר/י <strong>"הוסף למסך הבית"</strong></div>
         <div class="popup-step-icon">➕</div>
       </div>
       <div class="popup-step">
-        <div class="popup-step-num ios-num">4</div>
-        <div class="popup-step-txt">לחץ/י <strong>"הוסף"</strong> — האייקון יופיע על המסך 🎉</div>
+        <div class="popup-step-num num-ios">3</div>
+        <div class="popup-step-txt">לחץ/י <strong>"הוסף"</strong> — האייקון יופיע על מסך הבית 🎉</div>
         <div class="popup-step-icon">✅</div>
       </div>
-      <button class="popup-btn" onclick="closeInstallPopup()">הבנתי, תודה!</button>
     </div>
-    <div class="popup-steps" id="stepsAndroid">
+
+    <!-- Android Steps -->
+    <div class="popup-steps-android" id="stepsAndroid">
       <div class="popup-step">
-        <div class="popup-step-num android-num">1</div>
-        <div class="popup-step-txt">פתח את האתר <strong>בדפדפן Chrome</strong></div>
+        <div class="popup-step-num num-android">1</div>
+        <div class="popup-step-txt">ודא/י שהדף פתוח ב-<strong>Google Chrome</strong></div>
         <div class="popup-step-icon">🌐</div>
       </div>
       <div class="popup-step">
-        <div class="popup-step-num android-num">2</div>
+        <div class="popup-step-num num-android">2</div>
         <div class="popup-step-txt">לחץ/י על <strong>שלוש הנקודות</strong> ⋮ בפינה הימנית העליונה</div>
         <div class="popup-step-icon">⋮</div>
       </div>
       <div class="popup-step">
-        <div class="popup-step-num android-num">3</div>
-        <div class="popup-step-txt">בחר/י <strong>"הוסף למסך הבית"</strong> מהתפריט</div>
+        <div class="popup-step-num num-android">3</div>
+        <div class="popup-step-txt">בחר/י <strong>"הוסף למסך הבית"</strong></div>
         <div class="popup-step-icon">➕</div>
       </div>
       <div class="popup-step">
-        <div class="popup-step-num android-num">4</div>
+        <div class="popup-step-num num-android">4</div>
         <div class="popup-step-txt">לחץ/י <strong>"הוסף"</strong> — האייקון יופיע על מסך הבית 🎉</div>
         <div class="popup-step-icon">✅</div>
       </div>
-      <button class="popup-btn" style="background:linear-gradient(135deg,#00d4aa,#00866a);box-shadow:0 6px 24px rgba(0,212,170,0.4);" onclick="closeInstallPopup()">הבנתי, תודה!</button>
     </div>
+
+    <button class="popup-btn" onclick="closeInstallPopup()">הבנתי, תודה!</button>
   </div>
 </div>
 
-<!-- MODALS -->
-<div id="modalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;backdrop-filter:blur(4px);" onclick="closeModal()"></div>
-<div id="modal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1001;background:#111c2e;border-radius:24px 24px 0 0;padding:24px 20px 40px;max-height:80vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.08);">
-  <div style="width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 20px;"></div>
-  <h2 id="modalTitle" style="font-size:18px;font-weight:700;margin-bottom:16px;color:#f0f6ff;"></h2>
-  <div id="modalBody" style="font-size:13px;color:#5a7090;line-height:1.8;"></div>
-  <button onclick="closeModal()" style="margin-top:24px;width:100%;padding:13px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:14px;color:#3b82f6;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">סגור</button>
+<!-- ══ MODAL (אודות / פרטיות / תנאים) ══ -->
+<div id="modalOverlay" onclick="closeModal()"></div>
+<div id="modal">
+  <div class="modal-handle"></div>
+  <h2 id="modalTitle"></h2>
+  <div id="modalBody"></div>
+  <button class="modal-close" onclick="closeModal()">סגור</button>
 </div>
 
 <script>
-var ua = navigator.userAgent;
-var isIOS = /iphone|ipad|ipod/i.test(ua);
-var isAndroid = /android/i.test(ua);
-var isStandalone = window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+/* ════════════════════════════════════════════════════
+   DETECTION
+   ════════════════════════════════════════════════════ */
+var ua         = navigator.userAgent;
+var isIOS      = /iphone|ipad|ipod/i.test(ua);
+var isAndroid  = /android/i.test(ua);
+var isStandalone = window.navigator.standalone === true ||
+                   window.matchMedia('(display-mode: standalone)').matches;
 
+/* אם כבר מותקן → קפוץ לאפליקציה */
 if (isStandalone) { window.location.replace('/index.html'); }
 
-// Scroll dots
-var scroll = document.getElementById('phonesScroll');
-var dots = [0,1,2,3].map(function(i){ return document.getElementById('dot'+i); });
-if (scroll && dots[0]) {
+/* ════════════════════════════════════════════════════
+   CAROUSEL DOTS
+   ════════════════════════════════════════════════════ */
+var scroll = document.getElementById('screensScroll');
+var dots   = [0,1,2,3].map(function(i){ return document.getElementById('dot'+i); });
+if (scroll) {
   scroll.addEventListener('scroll', function() {
-    var frameW = scroll.scrollWidth / 4;
-    var idx = Math.round(scroll.scrollLeft / frameW);
+    var w   = scroll.scrollWidth / 4;
+    var idx = Math.round(scroll.scrollLeft / w);
     dots.forEach(function(d,i) {
       if (!d) return;
-      d.style.background = i === idx ? '#3b82f6' : 'rgba(255,255,255,0.06)';
-      d.style.width = i === idx ? '14px' : '5px';
+      d.style.background = i === idx ? 'var(--primary)' : 'rgba(255,255,255,0.12)';
+      d.style.width      = i === idx ? '14px' : '5px';
     });
   });
 }
 
-// PWA native install prompt (Android Chrome)
-var _prompt = null;
+/* ════════════════════════════════════════════════════
+   NATIVE INSTALL PROMPT (Android Chrome)
+   ════════════════════════════════════════════════════ */
+var _deferredPrompt = null;
+
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
-  _prompt = e;
+  _deferredPrompt = e;
+  /* אפשר גם להראות כפתור נוסף כאן */
 });
 
 window.addEventListener('appinstalled', function() {
-  _prompt = null;
+  _deferredPrompt = null;
   var btn = document.getElementById('heroInstallBtn');
   if (btn) { btn.textContent = '✅ הותקן בהצלחה!'; btn.classList.add('done'); }
-  setTimeout(function(){ window.location.href='/index.html'; }, 1500);
+  setTimeout(function(){ window.location.href = '/index.html'; }, 1500);
 });
 
-// Update button text based on platform
-window.addEventListener('DOMContentLoaded', function() {
-  if (isStandalone) return;
-  var btn = document.getElementById('heroInstallBtn');
-  if (!btn) return;
-  if (isAndroid) {
-    btn.textContent = '📲 הורד חינם';
-  } else if (isIOS) {
-    btn.textContent = '📲 הורד חינם';
-  }
-  // Desktop stays as-is
-});
-
+/* ════════════════════════════════════════════════════
+   HERO INSTALL BUTTON LOGIC
+   ════════════════════════════════════════════════════ */
 function heroInstall() {
   if (isAndroid) {
-    if (_prompt) {
-      _prompt.prompt();
-      _prompt.userChoice.then(function(r) { _prompt = null; });
+    if (_deferredPrompt) {
+      /* Native one-tap install */
+      _deferredPrompt.prompt();
+      _deferredPrompt.userChoice.then(function(r) { _deferredPrompt = null; });
     } else {
       showInstallPopup('android');
     }
   } else if (isIOS) {
-    /*
-     * iOS CRITICAL:
-     * Safari שומר את ה-URL הנוכחי כקיצור — לא את start_url.
-     * מעבירים ל-index.html?install=1 לפני ההוראות,
-     * כך שהקיצור יפתח את האפליקציה ישירות.
-     */
-    window.location.href = '/index.html?install=1';
+    showInstallPopup('ios');
   } else {
+    /* Desktop: fallback to iOS instructions (most familiar) */
     showInstallPopup('ios');
   }
 }
 
+/* ════════════════════════════════════════════════════
+   INSTALL POPUP
+   ════════════════════════════════════════════════════ */
 function showInstallPopup(platform) {
-  var popup = document.getElementById('installPopup');
-  if (!popup) return;
-
-  var stepsIOS = document.getElementById('stepsIOS');
-  var stepsAndroid = document.getElementById('stepsAndroid');
+  var popup   = document.getElementById('installPopup');
+  var stepsIO = document.getElementById('stepsIOS');
+  var stepsAn = document.getElementById('stepsAndroid');
+  var sub     = document.getElementById('popupSub');
 
   if (platform === 'android') {
-    if (stepsIOS) { stepsIOS.classList.remove('active'); }
-    if (stepsAndroid) { stepsAndroid.classList.add('active'); }
-    // Update popup title color hint
-    var title = popup.querySelector('.popup-title');
-    if (title) title.style.color = '#00d4aa';
-    var sub = popup.querySelector('.popup-sub');
-    if (sub) sub.textContent = 'הוסף את הממ"ד שלנו למסך הבית — בחינם, ישירות מ-Chrome';
+    stepsIO.classList.remove('active');
+    stepsAn.classList.add('active');
+    if (sub) sub.textContent = 'הוסף את האפליקציה למסך הבית — ישירות מ-Chrome';
   } else {
-    if (stepsAndroid) { stepsAndroid.classList.remove('active'); }
-    if (stepsIOS) { stepsIOS.classList.add('active'); }
-    var title = popup.querySelector('.popup-title');
-    if (title) title.style.color = '#f0f6ff';
-    var sub = popup.querySelector('.popup-sub');
-    if (sub) sub.textContent = 'התקן את הממ"ד שלנו בשניות — בחינם, ללא App Store';
+    stepsAn.classList.remove('active');
+    stepsIO.classList.add('active');
+    if (sub) sub.textContent = 'הוסף את האפליקציה למסך הבית — ישירות מ-Safari';
   }
-
   popup.classList.add('active');
-  sessionStorage.setItem('bannerSeen','1');
 }
 
 function closeInstallPopup() {
-  var popup = document.getElementById('installPopup');
-  if (popup) popup.classList.remove('active');
-  sessionStorage.setItem('installPopupSeen','1');
+  document.getElementById('installPopup').classList.remove('active');
+  sessionStorage.setItem('installPopupSeen', '1');
 }
 
-// Modals
-var modalContent = {
+/* ════════════════════════════════════════════════════
+   MODALS — EDIT: שנה את התוכן לפי הפרויקט שלך
+   ════════════════════════════════════════════════════ */
+var MODALS = {
   about: {
-    title: 'אודות האתר',
-    body: '<p>הממ"ד שלנו הוא אתר אינטרנט חינמי שנוצר לצורך הורדת האפליקציה הממ״ד שלנו.</p><br><p>האפליקציה מציעה משחקים, פעילויות וצלילי הרגעה ללא חיבור לאינטרנט כלל — כך שניתן לשחק במשחקים גם במצבים ללא אינטרנט או קליטה.</p><br><p>האפליקציה כוללת מערכת התראות בזמן אמת המחוברת לפיקוד העורף.</p><br><p><strong style="color:#f0f6ff">פותח על ידי:</strong> Yakir Hazan<br><strong style="color:#f0f6ff">שנה:</strong> 2026</p><br><p>לתמיכה ויצירת קשר: <a href="https://m.me/yakir.hazan.9" target="_blank" style="color:#3b82f6">שלח הודעה בפייסבוק</a></p>'
+    title: 'אודות האפליקציה',
+    /* EDIT */ body: '<p>תיאור מפורט של האפליקציה ומטרתה.</p><br><p><strong style="color:#eef2ff">פותח על ידי:</strong> שמך כאן<br><strong style="color:#eef2ff">שנה:</strong> 2025</p>'
   },
   privacy: {
     title: 'מדיניות פרטיות',
-    body: '<p><strong style="color:#f0f6ff">איסוף מידע</strong><br>האתר אינו אוסף, שומר או מעביר לצד שלישי כל מידע אישי על המשתמשים.</p><br><p><strong style="color:#f0f6ff">אחסון מקומי</strong><br>האתר שומר באופן מקומי על המכשיר שלך את בחירת העיר/אזור בלבד, לצורך הצגת התראות רלוונטיות. מידע זה נשאר על המכשיר שלך בלבד.</p><br><p><strong style="color:#f0f6ff">התראות פיקוד העורף</strong><br>האתר מתחבר לשרת פיקוד העורף לצורך קבלת התראות בזמן אמת. לא נשמר כל מידע על חיבורים אלו.</p><br><p><strong style="color:#f0f6ff">עוגיות (Cookies)</strong><br>האתר אינו משתמש בעוגיות.</p><br><p style="font-size:11px;opacity:0.6">עדכון אחרון: ינואר 2026</p>'
+    /* EDIT */ body: '<p><strong style="color:#eef2ff">איסוף מידע</strong><br>האפליקציה אינה אוספת, שומרת או מעבירה לצד שלישי כל מידע אישי.</p><br><p><strong style="color:#eef2ff">אחסון מקומי</strong><br>נתונים מסוימים נשמרים על המכשיר שלך בלבד.</p>'
   },
   terms: {
     title: 'תנאי שימוש',
-    body: '<p>ברוכים הבאים לממ״ד שלנו! השימוש באתר ובתכניו כפוף לתנאים הבאים:</p><br><p><strong style="color:#f0f6ff">1. זכויות יוצרים וקניין רוחני</strong><br>העיצוב הגרפי, הקוד, הסמלים המקוריים והתכנים הייחודיים הם רכושו הבלעדי של Yakir Hazan. המשחקים (כגון סנייק, טטריס, פונג וכו׳) נכתבו מאפס על ידי היוצר — הזכויות על הקוד והממשק שייכות ליוצר. רעיונות המשחקים הקלאסיים הם נחלת הכלל. אין להעתיק, לשכפל, להפיץ או לעשות שימוש מסחרי בעיצוב או בקוד ללא אישור בכתב.</p><br><p><strong style="color:#f0f6ff">2. שימוש מותר</strong><br>האתר נוצר לשימוש אישי ומהנה בלבד. אתם מוזמנים לשתף את הקישור עם חברים ובמדיה החברתית!</p><br><p><strong style="color:#f0f6ff">3. התראות חירום</strong><br>מערכת ההתראות מסתמכת על נתוני פיקוד העורף. האתר אינו אחראי לאיחורים, תקלות טכניות, או אי-דיוק במידע. בכל מצב חירום יש לפעול לפי הנחיות פיקוד העורף הרשמי.</p><br><p><strong style="color:#f0f6ff">4. הצהרת אי-אחריות</strong><br>האתר מסופק כפי שהוא (As-Is). היוצר אינו אחראי לכל נזק, ישיר או עקיף, שעלול להיגרם מהשימוש.</p><br><p><strong style="color:#f0f6ff">5. שינויים ועדכונים</strong><br>היוצר שומר לעצמו את הזכות לעדכן את תנאי השימוש או את תכני האתר בכל עת.</p><br><p style="font-size:11px;opacity:0.6">עדכון אחרון: ינואר 2026</p>'
+    /* EDIT */ body: '<p><strong style="color:#eef2ff">1. שימוש מותר</strong><br>האפליקציה נוצרה לשימוש אישי בלבד.</p><br><p><strong style="color:#eef2ff">2. זכויות יוצרים</strong><br>כל הקוד והעיצוב הם רכוש היוצר. אין להעתיק ללא אישור.</p>'
   }
 };
 
 function openModal(type) {
-  var content = modalContent[type];
-  if (!content) return;
-  document.getElementById('modalTitle').textContent = content.title;
-  document.getElementById('modalBody').innerHTML = content.body;
+  var c = MODALS[type]; if (!c) return;
+  document.getElementById('modalTitle').textContent  = c.title;
+  document.getElementById('modalBody').innerHTML     = c.body;
   document.getElementById('modalOverlay').style.display = 'block';
-  document.getElementById('modal').style.display = 'block';
+  document.getElementById('modal').style.display    = 'block';
   document.body.style.overflow = 'hidden';
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').style.display = 'none';
-  document.getElementById('modal').style.display = 'none';
+  document.getElementById('modal').style.display    = 'none';
   document.body.style.overflow = '';
 }
 
+/* ════════════════════════════════════════════════════
+   SERVICE WORKER REGISTRATION
+   ════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
