@@ -1,0 +1,652 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║           PWA APP PAGE — TEMPLATE                           ║
+  ║  תבנית דף האפליקציה הראשי (רק ב-standalone mode)            ║
+  ║  ————————————————————————————————————————————————————————    ║
+  ║  🔧 כל מה שצריך לשנות מסומן ב: <!-- EDIT: -->               ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- EDIT: שנה כותרת -->
+<title>שם האפליקציה</title>
+
+<!-- Open Graph -->
+<!-- EDIT: -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="שם האפליקציה">
+<meta property="og:description" content="תיאור האפליקציה">
+<meta property="og:image" content="https://your-domain.com/og-image.jpg">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- EDIT: -->
+<meta name="apple-mobile-web-app-title" content="שם האפליקציה">
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="icon" type="image/png" href="/icon.png">
+
+<!-- ════ GUARD: רק PWA ════
+     אם נכנסים בדפדפן רגיל → חזרה ללנדינג
+     הוסף ?pwa=1 ל-URL לדיבאג מהדפדפן  -->
+<script>
+(function() {
+  var standalone = window.navigator.standalone === true ||
+                   window.matchMedia('(display-mode: standalone)').matches ||
+                   new URLSearchParams(location.search).get('pwa') === '1';
+  if (!standalone) {
+    window.location.replace('/index.html');
+  }
+})();
+</script>
+
+<!-- ════ SERVICE WORKER CLEANUP ════ -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    regs.forEach(function(reg) {
+      if (reg.scope && !reg.scope.startsWith(location.origin)) {
+        reg.unregister();
+      }
+    });
+  });
+}
+</script>
+
+<!-- EDIT: פונט -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════════════
+   DESIGN TOKENS — שנה לפי הפרויקט שלך
+   ════════════════════════════════════════ */
+:root {
+  /* EDIT: */
+  --bg:         #08090f;
+  --surface:    #0e1117;
+  --card:       #141820;
+  --card-hover: #1a2030;
+  --border:     rgba(255,255,255,0.07);
+  --text:       #eef2ff;
+  --muted:      #5c6b8a;
+
+  /* EDIT: צבעי מותג */
+  --primary:   #4f7cff;
+  --secondary: #00c9a7;
+  --accent:    #9b5de5;
+  --danger:    #ff4757;
+  --warning:   #ffa502;
+  --success:   #26de81;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow:    0 8px 32px rgba(0,0,0,0.35);
+  --font:      'Heebo', -apple-system, sans-serif;
+
+  /* Safe area for notch / home bar */
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  direction: rtl;
+  /* safe area */
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+}
+
+/* ════════════ BACKGROUND ORBS ════════════ */
+.bg-orbs { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.orb {
+  position:absolute; border-radius:50%;
+  filter:blur(80px); opacity:0.18;
+  animation:drift 14s ease-in-out infinite alternate;
+}
+/* EDIT: שנה צבעי ורדיוס */
+.orb1 { width:320px;height:320px;background:var(--primary); top:-80px;right:-60px; animation-delay:0s; }
+.orb2 { width:260px;height:260px;background:var(--secondary);bottom:15%;left:-60px;  animation-delay:-5s; }
+.orb3 { width:190px;height:190px;background:var(--accent);   top:45%;right:5%;      animation-delay:-9s; }
+@keyframes drift {
+  from { transform:translate(0,0)scale(1); }
+  to   { transform:translate(18px,26px)scale(1.07); }
+}
+
+/* ════════════ HERO HEADER ════════════ */
+.hero {
+  width:100%; max-width:480px; margin:0 auto;
+  padding:44px 20px 24px;
+  text-align:center;
+  position:relative; z-index:1;
+}
+.hero-icon {
+  width:72px; height:72px;
+  margin:0 auto 16px;
+  background:linear-gradient(135deg,rgba(79,124,255,0.15),rgba(0,201,167,0.1));
+  border-radius:22px;
+  border:1.5px solid rgba(79,124,255,0.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px;
+  animation:glow 3s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,100%{box-shadow:0 0 20px rgba(79,124,255,0.15);}
+  50%    {box-shadow:0 0 44px rgba(79,124,255,0.35);}
+}
+/* EDIT: כותרת ותת-כותרת */
+.hero h1 {
+  font-size:26px; font-weight:900; letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#eef2ff 30%,var(--primary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; margin-bottom:6px;
+}
+.hero p { color:var(--muted); font-size:13px; line-height:1.5; }
+
+/* Settings button */
+.btn-settings {
+  position:absolute; top:calc(12px + var(--sat)); left:14px;
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.1);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:18px;
+  transition:background 0.2s, transform 0.2s;
+  text-decoration:none; color:inherit;
+}
+.btn-settings:hover { background:rgba(255,255,255,0.12); transform:rotate(30deg); }
+
+/* ════════════ MAIN CONTENT ════════════ */
+.main {
+  width:100%; max-width:480px; margin:0 auto;
+  padding:8px 16px 40px;
+  position:relative; z-index:1;
+  flex:1;
+}
+
+/* ════════════ SCREEN SYSTEM ════════════ */
+/* כל "מסך" (סקשן) מוחבא כברירת מחדל */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* כשמסך שאינו home פעיל — הסתר hero */
+body.screen-active .hero  { display:none; }
+body.screen-active .main  {
+  max-width:100%; padding:16px 16px 40px; min-height:100vh;
+}
+
+/* ════════════ HOME SCREEN ════════════ */
+/* רשת קארדים ראשית — EDIT: שנה לפי הפרויקט */
+.home-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:16px;
+}
+.home-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:20px 14px;
+  text-align:center;
+  cursor:pointer;
+  transition:background 0.2s, border-color 0.2s, transform 0.15s;
+  user-select:none;
+}
+.home-card:hover  { background:var(--card-hover); border-color:rgba(79,124,255,0.2); }
+.home-card:active { transform:scale(0.97); }
+.card-icon  { font-size:32px; margin-bottom:10px; }
+.card-title { font-size:14px; font-weight:700; margin-bottom:3px; }
+.card-desc  { font-size:11px; color:var(--muted); }
+
+/* Full-width card */
+.home-card.full {
+  grid-column:1 / -1;
+  display:flex; align-items:center; gap:16px;
+  text-align:right;
+  padding:18px 20px;
+}
+.home-card.full .card-icon  { font-size:28px; margin-bottom:0; flex-shrink:0; }
+.home-card.full .card-body  { flex:1; }
+.home-card.full .card-title { font-size:15px; }
+
+/* ════════════ BACK BUTTON ════════════ */
+.back-btn {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px 16px;
+  font-size:13px; font-weight:700;
+  cursor:pointer; color:var(--text);
+  margin-bottom:20px;
+  width:fit-content;
+  transition:background 0.2s;
+}
+.back-btn:hover { background:rgba(255,255,255,0.1); }
+
+/* ════════════ SECTION TITLE ════════════ */
+.section-title {
+  font-size:20px; font-weight:900; margin-bottom:6px;
+}
+.section-sub {
+  font-size:13px; color:var(--muted); margin-bottom:20px; line-height:1.5;
+}
+
+/* ════════════ SETTINGS SCREEN ════════════ */
+.settings-group {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.settings-group-label {
+  font-size:11px; font-weight:800; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--muted);
+  padding:12px 16px 8px;
+}
+.settings-row {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+  border-top:1px solid var(--border);
+  transition:background 0.15s;
+}
+.settings-row:first-of-type { border-top:none; }
+.settings-row:hover { background:rgba(255,255,255,0.03); }
+.settings-row-icon  { font-size:20px; width:32px; text-align:center; flex-shrink:0; }
+.settings-row-text  { flex:1; }
+.settings-row-title { font-size:14px; font-weight:600; }
+.settings-row-desc  { font-size:12px; color:var(--muted); margin-top:1px; }
+.settings-row-right { font-size:13px; color:var(--muted); }
+
+/* Toggle */
+.toggle {
+  width:44px; height:26px; border-radius:13px;
+  background:rgba(255,255,255,0.1);
+  position:relative; cursor:pointer;
+  transition:background 0.25s;
+  flex-shrink:0;
+}
+.toggle.on { background:var(--primary); }
+.toggle::after {
+  content:''; position:absolute;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff; top:3px; left:3px;
+  transition:transform 0.25s;
+  box-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+.toggle.on::after { transform:translateX(18px); }
+
+/* ════════════ TOAST ════════════ */
+#toast {
+  position:fixed; bottom:calc(24px + var(--sab)); left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(20,24,32,0.95);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:50px;
+  padding:10px 22px;
+  font-size:13px; font-weight:700;
+  color:var(--text);
+  z-index:9999;
+  opacity:0;
+  transition:opacity 0.3s, transform 0.3s;
+  pointer-events:none;
+  white-space:nowrap;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ════════════ RESPONSIVE ════════════ */
+@media (prefers-reduced-motion: reduce) {
+  * { animation:none !important; transition:none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <!-- Settings button — מוביל למסך הגדרות -->
+  <a class="btn-settings" href="#" onclick="showScreen('settings');return false;" aria-label="הגדרות">⚙️</a>
+
+  <div class="hero-icon">
+    <!-- EDIT: שנה אמוג'י או תמונת אייקון -->
+    🛡️
+  </div>
+  <!-- EDIT: -->
+  <h1>שם האפליקציה</h1>
+  <p>תת-כותרת קצרה שמסכמת מה האפליקציה עושה</p>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       HOME SCREEN
+       EDIT: הוסף / שנה קארדים לפי הפרויקט
+       ══════════════════════════════ -->
+  <div class="screen active" id="screen-home">
+
+    <div class="home-grid">
+
+      <!-- קארד 1 -->
+      <div class="home-card" onclick="showScreen('feature1')">
+        <div class="card-icon">🎮</div>
+        <!-- EDIT: -->
+        <div class="card-title">פיצ'ר 1</div>
+        <div class="card-desc">תיאור קצר</div>
+      </div>
+
+      <!-- קארד 2 -->
+      <div class="home-card" onclick="showScreen('feature2')">
+        <div class="card-icon">🎵</div>
+        <!-- EDIT: -->
+        <div class="card-title">פיצ'ר 2</div>
+        <div class="card-desc">תיאור קצר</div>
+      </div>
+
+      <!-- קארד 3 -->
+      <div class="home-card" onclick="showScreen('feature3')">
+        <div class="card-icon">📊</div>
+        <!-- EDIT: -->
+        <div class="card-title">פיצ'ר 3</div>
+        <div class="card-desc">תיאור קצר</div>
+      </div>
+
+      <!-- קארד 4 -->
+      <div class="home-card" onclick="showScreen('feature4')">
+        <div class="card-icon">🔔</div>
+        <!-- EDIT: -->
+        <div class="card-title">פיצ'ר 4</div>
+        <div class="card-desc">תיאור קצר</div>
+      </div>
+
+      <!-- קארד רחב -->
+      <div class="home-card full" onclick="showScreen('feature5')">
+        <div class="card-icon">⭐</div>
+        <div class="card-body">
+          <!-- EDIT: -->
+          <div class="card-title">פיצ'ר מיוחד — רחב</div>
+          <div class="card-desc">תיאור ארוך יותר לקארד הרחב</div>
+        </div>
+        <div style="color:var(--muted);font-size:18px;">›</div>
+      </div>
+
+    </div>
+  </div><!-- /home -->
+
+  <!-- ══════════════════════════════
+       FEATURE 1 SCREEN
+       EDIT: שנה כותרת + תוכן
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-feature1">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <!-- EDIT: -->
+    <div class="section-title">פיצ'ר 1 🎮</div>
+    <div class="section-sub">תיאור מפורט של הפיצ'ר הזה</div>
+
+    <!-- EDIT: הוסף כאן את התוכן של המסך -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;color:var(--muted);">
+      תוכן הפיצ'ר כאן
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       FEATURE 2 SCREEN
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-feature2">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <div class="section-title">פיצ'ר 2 🎵</div>
+    <div class="section-sub">תיאור מפורט</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;color:var(--muted);">
+      תוכן הפיצ'ר כאן
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       FEATURE 3 SCREEN
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-feature3">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <div class="section-title">פיצ'ר 3 📊</div>
+    <div class="section-sub">תיאור מפורט</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;color:var(--muted);">
+      תוכן הפיצ'ר כאן
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       FEATURE 4 SCREEN
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-feature4">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <div class="section-title">פיצ'ר 4 🔔</div>
+    <div class="section-sub">תיאור מפורט</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;color:var(--muted);">
+      תוכן הפיצ'ר כאן
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       FEATURE 5 SCREEN
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-feature5">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <div class="section-title">פיצ'ר מיוחד ⭐</div>
+    <div class="section-sub">תיאור מפורט</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;color:var(--muted);">
+      תוכן הפיצ'ר כאן
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SETTINGS SCREEN
+       EDIT: הוסף / שנה הגדרות
+       ══════════════════════════════ -->
+  <div class="screen" id="screen-settings">
+    <button class="back-btn" onclick="goHome()">← חזרה</button>
+    <div class="section-title">הגדרות ⚙️</div>
+
+    <!-- קבוצה 1 -->
+    <!-- EDIT: -->
+    <div class="settings-group">
+      <div class="settings-group-label">כללי</div>
+
+      <div class="settings-row">
+        <div class="settings-row-icon">🔔</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">התראות</div>
+          <div class="settings-row-desc">קבל עדכונים בזמן אמת</div>
+        </div>
+        <div class="toggle" id="toggleNotif" onclick="toggleSetting('notif',this)"></div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-icon">🔊</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">צלילים</div>
+          <div class="settings-row-desc">השמע צלילי מערכת</div>
+        </div>
+        <div class="toggle on" id="toggleSound" onclick="toggleSetting('sound',this)"></div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-icon">🌙</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">מצב לילה</div>
+          <div class="settings-row-desc">ממשק כהה (תמיד פעיל)</div>
+        </div>
+        <div class="settings-row-right">תמיד</div>
+      </div>
+    </div>
+
+    <!-- קבוצה 2 -->
+    <!-- EDIT: -->
+    <div class="settings-group">
+      <div class="settings-group-label">אודות</div>
+
+      <div class="settings-row" onclick="showToast('גרסה 1.0.0')">
+        <div class="settings-row-icon">📱</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">גרסת אפליקציה</div>
+        </div>
+        <!-- EDIT: -->
+        <div class="settings-row-right">1.0.0</div>
+      </div>
+
+      <div class="settings-row" onclick="window.open('https://m.me/your-page','_blank')">
+        <div class="settings-row-icon">💬</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title">צור קשר</div>
+          <div class="settings-row-desc">שלח הודעה ליוצר</div>
+        </div>
+        <div class="settings-row-right">›</div>
+      </div>
+
+      <div class="settings-row" onclick="clearData()">
+        <div class="settings-row-icon">🗑️</div>
+        <div class="settings-row-text">
+          <div class="settings-row-title" style="color:var(--danger);">אפס נתונים</div>
+          <div class="settings-row-desc">מחק את כל הנתונים המקומיים</div>
+        </div>
+        <div class="settings-row-right">›</div>
+      </div>
+    </div>
+
+  </div><!-- /settings -->
+
+</div><!-- /main -->
+
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   SCREEN ROUTER
+   ════════════════════════════════════════════════════ */
+var _currentScreen = 'home';
+
+function showScreen(name) {
+  /* הסתר הכל */
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+
+  /* הצג את הנבחר */
+  var next = document.getElementById('screen-' + name);
+  if (!next) { console.warn('screen not found:', name); return; }
+  next.classList.add('active');
+  _currentScreen = name;
+
+  /* body class לפי מצב */
+  if (name === 'home') {
+    document.body.classList.remove('screen-active');
+  } else {
+    document.body.classList.add('screen-active');
+  }
+
+  window.scrollTo(0,0);
+}
+
+function goHome() {
+  showScreen('home');
+}
+
+/* Android back button */
+window.addEventListener('popstate', function() {
+  if (_currentScreen !== 'home') { goHome(); }
+});
+
+/* ════════════════════════════════════════════════════
+   SETTINGS TOGGLES
+   ════════════════════════════════════════════════════ */
+function toggleSetting(key, el) {
+  var val = !el.classList.contains('on');
+  el.classList.toggle('on', val);
+  localStorage.setItem('setting_' + key, val ? '1' : '0');
+  showToast(val ? '✅ הופעל' : '❌ כובה');
+}
+
+/* טען הגדרות שמורות */
+(function loadSettings() {
+  ['notif','sound'].forEach(function(key) {
+    var saved = localStorage.getItem('setting_' + key);
+    if (saved !== null) {
+      var el = document.getElementById('toggle' + key.charAt(0).toUpperCase() + key.slice(1));
+      if (el) el.classList.toggle('on', saved === '1');
+    }
+  });
+})();
+
+/* ════════════════════════════════════════════════════
+   CLEAR DATA
+   ════════════════════════════════════════════════════ */
+function clearData() {
+  if (!confirm('למחוק את כל הנתונים המקומיים?')) return;
+  localStorage.clear();
+  sessionStorage.clear();
+  showToast('✅ הנתונים נמחקו');
+  setTimeout(function(){ location.reload(); }, 1000);
+}
+
+/* ════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════ */
+var _toastTimer = null;
+function showToast(msg, duration) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration || 2200);
+}
+
+/* ════════════════════════════════════════════════════
+   SERVICE WORKER REGISTRATION
+   ════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg){ console.log('[SW] registered:', reg.scope); })
+      .catch(function(err){ console.warn('[SW] error:', err); });
+  });
+}
+
+/* ════════════════════════════════════════════════════
+   PUSH NOTIFICATIONS (אופציונלי)
+   EDIT: הסר אם לא צריך
+   ════════════════════════════════════════════════════ */
+function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(function(p) {
+    showToast(p === 'granted' ? '🔔 התראות הופעלו!' : '❌ התראות נדחו');
+    var el = document.getElementById('toggleNotif');
+    if (el) el.classList.toggle('on', p === 'granted');
+    localStorage.setItem('setting_notif', p === 'granted' ? '1' : '0');
+  });
+}
+</script>
+</body>
+</html>

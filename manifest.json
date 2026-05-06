@@ -7,7 +7,7 @@
   "lang":             "he",
   "dir":              "rtl",
 
-  "start_url":        "/index.html",
+  "start_url": "/app.html",
   "scope":            "/",
   "display":          "standalone",
   "orientation":      "portrait",
