@@ -17,15 +17,15 @@
 <meta name="description" content="תיאור קצר של האפליקציה — מה היא עושה ולמה כדאי להוריד">
 
 <!-- PWA -->
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/Template/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- EDIT: שנה את שם האפליקציה -->
 <meta name="apple-mobile-web-app-title" content="שם האפליקציה">
 <!-- EDIT: עדכן נתיב האייקון -->
-<link rel="apple-touch-icon" href="/icon.png">
-<link rel="icon" type="image/png" href="/icon.png">
+<link rel="apple-touch-icon" href="/Template/icon.png">
+<link rel="icon" type="image/png" href="/Template/icon.png">
 
 <!-- Open Graph -->
 <!-- EDIT: עדכן OG tags לשיתוף ברשתות חברתיות -->
@@ -722,7 +722,7 @@ var isStandalone = window.navigator.standalone === true ||
                    window.matchMedia('(display-mode: standalone)').matches;
 
 /* אם כבר מותקן → קפוץ לאפליקציה */
-if (isStandalone) { window.location.replace('/Template/'); }
+if (isStandalone) { window.location.replace('/Template/index.html'); }
 
 /* ════════════════════════════════════════════════════
    CAROUSEL DOTS
@@ -756,7 +756,7 @@ window.addEventListener('appinstalled', function() {
   _deferredPrompt = null;
   var btn = document.getElementById('heroInstallBtn');
   if (btn) { btn.textContent = '✅ הותקן בהצלחה!'; btn.classList.add('done'); }
-  setTimeout(function(){ window.location.href = '/Template/'; }, 1500);
+  setTimeout(function(){ window.location.href = '/Template/index.html'; }, 1500);
 });
 
 /* ════════════════════════════════════════════════════
@@ -765,16 +765,24 @@ window.addEventListener('appinstalled', function() {
 function heroInstall() {
   if (isAndroid) {
     if (_deferredPrompt) {
-      /* Native one-tap install */
+      /* Native one-tap install — כבר על הדף הנכון */
       _deferredPrompt.prompt();
       _deferredPrompt.userChoice.then(function(r) { _deferredPrompt = null; });
     } else {
       showInstallPopup('android');
     }
   } else if (isIOS) {
-    showInstallPopup('ios');
+    /*
+     * iOS CRITICAL FIX:
+     * Safari שומר את ה-URL הנוכחי כ-start_url של הקיצור —
+     * ולכן אנחנו מעבירים את המשתמש ל-index.html (האפליקציה)
+     * לפני שמציגים לו את הוראות ה"הוסף למסך הבית".
+     * כך האייקון על מסך הבית יפתח את האפליקציה ישירות ולא את הלנדינג.
+     */
+    sessionStorage.setItem('showInstallOnLoad', '1');
+    window.location.href = '/Template/index.html?from=landing';
   } else {
-    /* Desktop: fallback to iOS instructions (most familiar) */
+    /* Desktop fallback */
     showInstallPopup('ios');
   }
 }
@@ -841,7 +849,7 @@ function closeModal() {
    SERVICE WORKER REGISTRATION
    ════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Template/sw.js').catch(function(){});
+  navigator.serviceWorker.register('/Template/sw.js', { scope: '/Template/' }).catch(function(){});
 }
 </script>
 </body>

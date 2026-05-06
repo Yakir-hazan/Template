@@ -15,17 +15,16 @@ var CACHE_NAME = 'app-v1.0.0';
    הוסף כאן את כל הנכסים הסטטיים שלך
    ════════════════════════════════════════ */
 var STATIC_FILES = [
-  '/',
   '/Template/',
-  '/Template/landing.html',
+  '/Template/index.html',       /* ← האפליקציה הראשית */
+  '/Template/landing.html',     /* ← דף הנחיתה */
   '/Template/manifest.json',
   '/Template/icon.png',
   '/Template/icon-192.png',
   '/Template/icon-512.png',
   /* EDIT: הוסף קבצי JS, CSS, פונטים, תמונות */
-  /* '/app.js', */
-  /* '/style.css', */
-  /* '/offline.html', */
+  /* '/Template/app.js', */
+  /* '/Template/style.css', */
 ];
 
 /* ════════════════════════════════════════
@@ -35,12 +34,11 @@ self.addEventListener('install', function(event) {
   console.log('[SW] Install:', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      /* ignoreSearch: true מאפשר cache-hit גם עם query params */
       return cache.addAll(STATIC_FILES).catch(function(err) {
         console.warn('[SW] Cache addAll partial fail:', err);
       });
     }).then(function() {
-      return self.skipWaiting(); /* הפעל SW חדש מיידית */
+      return self.skipWaiting();
     })
   );
 });
@@ -57,36 +55,32 @@ self.addEventListener('activate', function(event) {
             .map(function(k)   { console.log('[SW] Delete old cache:', k); return caches.delete(k); })
       );
     }).then(function() {
-      return self.clients.claim(); /* קח שליטה על כל הטאבים מיד */
+      return self.clients.claim();
     })
   );
 });
 
 /* ════════════════════════════════════════
-   FETCH — אסטרטגיית Cache First עם Network Fallback
+   FETCH — Cache First + Network Fallback
    ════════════════════════════════════════ */
 self.addEventListener('fetch', function(event) {
   var req = event.request;
 
-  /* דלג על בקשות לא-GET */
   if (req.method !== 'GET') return;
-
-  /* דלג על cross-origin (APIs חיצוניים, Firebase וכו') */
   if (!req.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
     caches.match(req).then(function(cached) {
       if (cached) {
-        /* הגש מה-cache, ובמקביל עדכן ברקע (Stale-While-Revalidate) */
-        fetchAndCache(req);
+        fetchAndCache(req); /* Stale-While-Revalidate */
         return cached;
       }
-      /* אין cache — נסה רשת */
       return fetchAndCache(req).catch(function() {
-        /* אין רשת + אין cache — הגש offline fallback */
+        /* אין רשת + אין cache — fallback */
         if (req.destination === 'document') {
-          return caches.match('/offline.html') ||
-                 new Response('<h1>אין חיבור לאינטרנט</h1>', {
+          /* נסה להגיש את דף האפליקציה מה-cache */
+          return caches.match('/Template/index.html') ||
+                 new Response('<h1 dir="rtl" style="font-family:sans-serif;text-align:center;margin-top:40px;">אין חיבור לאינטרנט</h1>', {
                    headers: { 'Content-Type': 'text/html; charset=utf-8' }
                  });
         }
@@ -98,7 +92,6 @@ self.addEventListener('fetch', function(event) {
 
 function fetchAndCache(req) {
   return fetch(req).then(function(res) {
-    /* שמור רק תשובות תקינות */
     if (!res || res.status !== 200 || res.type !== 'basic') return res;
     var clone = res.clone();
     caches.open(CACHE_NAME).then(function(c) { c.put(req, clone); });
@@ -119,7 +112,7 @@ self.addEventListener('push', function(event) {
       icon:    data.icon    || '/Template/icon-192.png',
       badge:   data.badge   || '/Template/icon-192.png',
       tag:     data.tag     || 'default',
-      data:    data.url     || '/',
+      data:    data.url     || '/Template/',
       vibrate: [200, 100, 200],
       dir:     'rtl',
       lang:    'he'
@@ -129,7 +122,7 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  var url = event.notification.data || '/';
+  var url = event.notification.data || '/Template/';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
       for (var c of list) {

@@ -4,7 +4,7 @@
   "description":      "תיאור האפליקציה",
   "lang":             "he",
   "dir":              "rtl",
-  "start_url":        "/Template/",
+  "start_url":        "/Template/index.html",
   "scope":            "/Template/",
   "display":          "standalone",
   "orientation":      "portrait",
